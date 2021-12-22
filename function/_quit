@@ -1,0 +1,6 @@
+_quit(){
+    local retCode="$1" msg="${*:2}"
+
+    printf '%s \n' "$msg"
+    exit "$retCode"
+}
