@@ -1,0 +1,13 @@
+cd(){
+    local path="$1"
+    # A little bit more easy if file was specified
+    [[ -z "$path" ]] && { builtin cd; return; }
+
+    if [[ -f "$path" ]]; then
+        path="${path%/*}"
+
+    fi
+
+    builtin cd "${path:-/}"
+
+}
