@@ -1,0 +1,42 @@
+sc(){
+    local -A shortcut=(
+        [sp]="stop"
+        [ss]="start"
+        [st]="status"
+        [rs]="restart"
+        [rl]="reload"
+        [ld]="list-dependencies"
+        [rd]="daemon-reload"
+        [xd]="daemon-reexec"
+    )
+
+    local arg="$1"
+    local target="${*:2}"
+    local sudo
+
+    local print_help='USAGE: sc [-s] ARG
+    sp = stop
+    ss = start
+    st = status
+    rs = restart
+    rl = reload
+    ld = list-dependencies
+    dr = daemon-reload
+    dx = daemon-reexec
+
+    -s = sudo
+    '
+
+    if [[ "$arg" == "-"* ]] ; then
+        case "${arg}" in
+            -h)      { printf '%s\n' "$print_help" ; return; }   ;;
+            -s)      sudo="sudo"                                 ;;
+        esac
+        arg="$2"
+        target="${*:3}"
+    fi
+
+    [[ -z "$arg" ]] && { printf '%s\n' "$print_help" ; return; }
+
+    command $sudo systemctl ${shortcut[$arg]:-$arg} $target
+}
