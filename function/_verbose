@@ -12,7 +12,6 @@ _verbose(){
 
     (( LEVEL <= DEBUG_LEVEL )) && {
         until (( ${#c} == LEVEL )); do c+=":"; done
-        printout="+ $c    "
         if (( funcnamenumber > 0 )); then
             printout+="("
             for ((i=1;i<=funcnamenumber;i++)); do
@@ -20,6 +19,6 @@ _verbose(){
             done
             printout="${printout% <- }) - "
         fi
-        printf '%s\n' "$printout $*" 1>&2
+        printf '%-7s %s %s\n' "+ $c" "$printout" "$*" 1>&2
     }
 }
