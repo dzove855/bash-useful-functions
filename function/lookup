@@ -1,0 +1,8 @@
+lookup(){
+    [[ -z "$1" ]] && return
+    local -a _path
+    IFS=':' read -a _path <<<"$PATH"
+    for p in "${_path[@]}"; do
+        PATH="$p" type -p "$1"
+    done
+}
