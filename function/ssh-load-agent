@@ -1,0 +1,39 @@
+ssh-load-agent(){
+    # load key and save them in a file to reload after
+    local sshAgentPidFile="${TMPDIR:-/tmp}/ssh-agent.${USER}.pid"
+    local currentTime
+    function ssh-create-agent(){
+        ssh-agent || {
+            printf '%s\n' "Could not create agent!"
+            return 1
+        }
+        printf 'export SSH_AGENT_LIFE=%(%s)T\n' -1
+    }
+
+    function ssh-key(){
+        ssh-add -t 10h ${SSH_KEYS} || {
+            printf '%s\n' "Could not load keys!"
+            return 1
+        }
+    }
+
+    function ssh-load(){
+        set -a
+        source $sshAgentPidFile
+        set +a
+    }
+
+    if [[ -f "$sshAgentPidFile" ]]; then
+        ssh-load
+        ps -p $SSH_AGENT_PID &>/dev/null || SSH_AGENT_LIFE=0
+    fi
+
+    printf -v currentTime '%(%s)T' -1
+
+    if (( ( currentTime - ${SSH_AGENT_LIFE:-0} ) > 32400 )); then
+        ssh-create-agent &> $sshAgentPidFile || return
+        ssh-load
+        ssh-key || return
+    fi
+
+}
